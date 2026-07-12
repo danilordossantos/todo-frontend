@@ -1,4 +1,5 @@
 import { useState } from "react"
+import TaskList from "./components/TaskList"
 
 const App = () => {
     const [taskList, setTaskList] = useState([{
@@ -24,7 +25,28 @@ const App = () => {
         setContent('')
     }
 
+    const toggleDone = (id) => {
+        const toggleTask = taskList.map(t => {
+            if (t.id === id) {
+                return { ...t, done: !t.done }
+            } else {
+                return t
+            }
+        })
+        setTaskList(toggleTask)
+    }
+
+    const deleteTask = (id) => {
+        const delTask = taskList.filter(t =>
+            t.id !== id
+        )
+        setTaskList(delTask)
+    }
+
     return <>
+        <TaskList taskList={taskList}
+        onToggle={toggleDone}
+        onDelete={deleteTask}/>
         <form action="" onSubmit={addTask}>
             <input type="text" value={content} name="content" id="content" onChange={(e) => {
                 setContent(e.target.value)
