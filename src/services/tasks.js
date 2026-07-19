@@ -18,4 +18,4 @@ const remove = (id) => {
     return axios.delete(`${baseUrl}/${id}`).then(res => res.data)
 }
 
-export {create, getAll, update, remove}
+export default {create, getAll, update, remove}
