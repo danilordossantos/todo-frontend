@@ -13,6 +13,8 @@ const App = () => {
 
     const [priority, setPriority] = useState('medium')
 
+    const [filter, setFilter] = useState('all')
+
     const addTask = (e) => {
         e.preventDefault()
         const task = {
@@ -43,10 +45,32 @@ const App = () => {
         setTaskList(delTask)
     }
 
+    const tasksToShow = taskList.filter(t => {
+        if (filter === 'all') {
+            return true
+        }
+        if (filter === 'pending') {
+            return t.done === false
+        }
+        if (filter === 'done') {
+            return t.done === true
+        }
+    }
+    )
+
     return <>
-        <TaskList taskList={taskList}
-        onToggle={toggleDone}
-        onDelete={deleteTask}/>
+    <button type="button" onClick={() => {
+        setFilter('all')
+    }}>All</button>
+    <button type="button" onClick={() => {
+        setFilter('pending')
+    }}>Pending</button>
+    <button type="button" onClick={() => {
+        setFilter('done')
+    }}>Done</button>
+        <TaskList taskList={tasksToShow}
+            onToggle={toggleDone}
+            onDelete={deleteTask} />
         <form action="" onSubmit={addTask}>
             <input type="text" value={content} name="content" id="content" onChange={(e) => {
                 setContent(e.target.value)
