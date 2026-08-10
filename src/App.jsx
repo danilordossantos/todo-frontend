@@ -54,19 +54,15 @@ const App = () => {
     }
 
     const toggleDone = (id) => {
-        const toggleTask = taskList.map(t => {
-            if (t.id === id) {
-                if (t.done === false) {
-                    showNotification('Task completed', 'success')
-                } else {
-                    showNotification('Task reopened', 'error')
-                }
-                return { ...t, done: !t.done }
-            } else {
-                return t
-            }
-        })
-        setTaskList(toggleTask)
+        const findTask = taskList.find(t => t.id === id)
+        if (!findTask.done) {
+            showNotification('Task completed', 'success')
+        } else {
+            showNotification('Task reopened', 'error')
+        }
+        const updateDone = { ...findTask, done: !findTask.done }
+        taskService.update(id, updateDone).then(updatedTask => setTaskList(taskList.map(t => t.id === updatedTask.id ? updatedTask : t)))
+
     }
 
     const deleteTask = (id) => {
