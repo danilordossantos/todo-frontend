@@ -1,5 +1,8 @@
 import { useState } from "react"
 import TaskList from "./components/TaskList"
+import Notification from "./components/Notification"
+import { useEffect } from "react"
+import taskService from "./services/tasks"
 
 const App = () => {
     const [taskList, setTaskList] = useState([{
@@ -15,21 +18,49 @@ const App = () => {
 
     const [filter, setFilter] = useState('all')
 
+    const [notification, setNotification] = useState(null
+    )
+
+    useEffect(() => {
+        taskService.getAll().then(taskList => {
+            setTaskList(taskList)
+        })
+    }, [])
+
+    const showNotification = (message, type) => {
+        setNotification({ message, type })
+        setTimeout(() => setNotification(null), 3000)
+    }
+
     const addTask = (e) => {
         e.preventDefault()
-        const task = {
-            id: Date.now(),
+        const newTask = {
             content: content,
             done: false,
             priority: priority
         }
-        setTaskList([...taskList, task])
+
+        if (content === '') {
+            showNotification('Content cannot be empty', 'error')
+            return
+        }
+
+        taskService.create(newTask).then(task => {
+            setTaskList(taskList.concat(task))
+        })
+
+        showNotification('Task added', 'success')
         setContent('')
     }
 
     const toggleDone = (id) => {
         const toggleTask = taskList.map(t => {
             if (t.id === id) {
+                if (t.done === false) {
+                    showNotification('Task completed', 'success')
+                } else {
+                    showNotification('Task reopened', 'error')
+                }
                 return { ...t, done: !t.done }
             } else {
                 return t
@@ -39,6 +70,7 @@ const App = () => {
     }
 
     const deleteTask = (id) => {
+        showNotification('Task Deleted', 'success')
         const delTask = taskList.filter(t =>
             t.id !== id
         )
@@ -59,15 +91,16 @@ const App = () => {
     )
 
     return <>
-    <button type="button" onClick={() => {
-        setFilter('all')
-    }}>All</button>
-    <button type="button" onClick={() => {
-        setFilter('pending')
-    }}>Pending</button>
-    <button type="button" onClick={() => {
-        setFilter('done')
-    }}>Done</button>
+        <Notification message={notification?.message} type={notification?.type} />
+        <button type="button" onClick={() => {
+            setFilter('all')
+        }}>All</button>
+        <button type="button" onClick={() => {
+            setFilter('pending')
+        }}>Pending</button>
+        <button type="button" onClick={() => {
+            setFilter('done')
+        }}>Done</button>
         <TaskList taskList={tasksToShow}
             onToggle={toggleDone}
             onDelete={deleteTask} />
