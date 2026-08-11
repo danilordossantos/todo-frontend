@@ -67,10 +67,8 @@ const App = () => {
 
     const deleteTask = (id) => {
         showNotification('Task Deleted', 'success')
-        const delTask = taskList.filter(t =>
-            t.id !== id
-        )
-        setTaskList(delTask)
+        taskService.remove(id).then(() => setTaskList(taskList.filter(t =>
+            t.id !== id)))
     }
 
     const tasksToShow = taskList.filter(t => {
